@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bakeep - Gestor de Finanzas</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<style>
+:root{
+  --desk:#008080;--desk2:#00a0a0;--face:#c0c0c0;--hi:#fff;--sh:#808080;--dk:#000;
+  --title1:#000080;--title2:#1084d0;--paper:#fffbe8;--ink:#0b2a3a;--brand:#005f73;--cell:#fff;--cellalt:#f1f6e4;
+  --a1:#ffcc00;--a2:#ff6b35;--a3:#2ec4b6;--a4:#5b5fef;--neg:#c1121f;--pos:#1b7a3a;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--desk:#04373b;--desk2:#06494e;--paper:#1d2a33;--ink:#e8f1f2;--brand:#7fe3d6;--face:#a9a9a9;--cell:#26343d;--cellalt:#2d3d47;--neg:#ff8a8a;--pos:#7ee09a}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:'VT323',monospace;font-size:22px;
+  background:linear-gradient(45deg,var(--desk2) 25%,transparent 25%,transparent 75%,var(--desk2) 75%) 0 0/8px 8px,linear-gradient(45deg,var(--desk2) 25%,var(--desk) 25%,var(--desk) 75%,var(--desk2) 75%) 4px 4px/8px 8px;
+  background-color:var(--desk);padding:18px 14px 64px}
+.px{font-family:'Press Start 2P',monospace}
+.bevel{background:var(--face);border:2px solid;border-color:var(--hi) var(--dk) var(--dk) var(--hi);box-shadow:inset -1px -1px 0 var(--sh),inset 1px 1px 0 #dfdfdf}
+.sunk{border:2px solid;border-color:var(--sh) var(--hi) var(--hi) var(--sh);box-shadow:inset 1px 1px 0 var(--dk)}
+.window{max-width:1000px;margin:0 auto;padding:3px;box-shadow:6px 6px 0 rgba(0,0,0,.35),inset -1px -1px 0 var(--sh),inset 1px 1px 0 #dfdfdf}
+.titlebar{display:flex;align-items:center;gap:8px;padding:4px 6px;color:#fff;background:linear-gradient(90deg,var(--title1),var(--title2))}
+.titlebar .px{font-size:11px;flex:1}
+.ctrl{display:flex;gap:3px}
+.ctrl b{width:22px;height:20px;display:grid;place-items:center;color:#000;font:700 14px/1 'VT323',monospace}
+.folder{width:20px;height:16px;background:var(--a1);border:2px solid #000;border-radius:2px 6px 2px 2px}
+.tabs{display:flex;gap:2px;padding:10px 8px 0;flex-wrap:wrap}
+.tab{font:inherit;font-size:21px;color:#000;background:var(--face);padding:6px 16px 4px;cursor:pointer;border:2px solid;border-color:var(--hi) var(--dk) transparent var(--hi);border-radius:6px 6px 0 0;margin-top:6px;position:relative;top:2px}
+.tab:hover{background:#d4d4d4}
+.tab.on{margin-top:0;padding-top:10px;background:var(--a3);font-weight:bold;z-index:2}
+.panel{background:var(--paper);padding:28px 20px 36px;min-height:440px;border:2px solid;border-color:var(--sh) var(--hi) var(--hi) var(--sh);box-shadow:inset 1px 1px 0 var(--dk)}
+.view{display:none}.view.on{display:block}
+h1{margin:6px 0 22px;text-align:center;font:400 clamp(34px,9vw,84px)/1 'Press Start 2P',monospace;color:var(--brand);text-shadow:4px 4px 0 var(--a1),8px 8px 0 var(--a2)}
+h2{font:400 15px/1.5 'Press Start 2P',monospace;color:var(--brand);margin:0 0 6px}
+h3{font:400 12px/1.5 'Press Start 2P',monospace;color:var(--brand);margin:26px 0 10px}
+p.lead{margin:0 0 18px}
+.search{display:flex;max-width:560px;margin:0 auto 30px}
+input,select{font:inherit;font-size:22px;padding:6px 10px;background:#fff;color:#000;border:2px solid;border-color:var(--sh) var(--hi) var(--hi) var(--sh);box-shadow:inset 1px 1px 0 var(--dk);min-width:0;width:100%}
+.search input{flex:1}
+.btn{font:inherit;font-size:21px;color:#000;padding:4px 18px;cursor:pointer;width:auto}
+.btn:active{border-color:var(--dk) var(--hi) var(--hi) var(--dk)}
+.dialogs{display:grid;gap:18px;max-width:640px;margin:0 auto}
+.dlg{padding:3px;box-shadow:5px 5px 0 rgba(0,0,0,.25),inset -1px -1px 0 var(--sh),inset 1px 1px 0 #dfdfdf;width:min(100%,420px);cursor:pointer;font:inherit;text-align:left;color:#000}
+.dlg:nth-child(2){justify-self:end}
+.dlg .titlebar{padding:2px 4px;background:linear-gradient(90deg,var(--c),var(--c2))}
+.dlg .titlebar .px{font-size:8px}
+.dlg .body{display:flex;gap:12px;align-items:center;padding:14px 12px;font-size:26px}
+.ico{width:34px;height:34px;flex:none;display:grid;place-items:center;font:700 18px 'Press Start 2P',monospace;color:#fff;border:2px solid #000;background:var(--ic);box-shadow:inset 2px 2px 0 rgba(255,255,255,.5)}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:16px 0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:12px 0}
+label{display:block;margin-bottom:4px}
+label small{display:block;font-size:18px;opacity:.75}
+.msg{display:flex;gap:12px;align-items:center;padding:10px 12px;margin:16px 0;color:#000;max-width:720px}
+.msg .ico{width:30px;height:30px;font-size:16px}
+.msg.ok .ico{--ic:#1b7a3a}.msg.warn .ico{--ic:#e09f00}.msg.err .ico{--ic:#c1121f}.msg.info .ico{--ic:#1084d0}
+[hidden]{display:none!important}
+.tw{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:20px;background:var(--cell)}
+th{background:var(--title1);color:#fff;font-weight:400;padding:4px 8px;text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+td{padding:3px 8px;text-align:right;border-bottom:1px solid var(--sh)}
+tbody tr:nth-child(even){background:var(--cellalt)}
+.neg{color:var(--neg)}.pos{color:var(--pos)}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:20px 0}
+.metric{padding:10px 12px;background:var(--cell)}
+.metric span{display:block;font-size:18px;opacity:.8}
+.metric b{font:400 13px/1.6 'Press Start 2P',monospace;color:var(--brand);word-break:break-all}
+.chart{background:var(--cell);padding:8px}
+.chart svg{display:block;width:100%;height:auto}
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:6px;font-size:20px}
+.legend i{display:inline-block;width:14px;height:14px;margin-right:6px;vertical-align:-1px;border:1px solid #000}
+.formula{background:var(--cell);padding:8px 12px;font-size:20px;margin:6px 0 0;overflow-x:auto;white-space:nowrap}
+.progress{height:28px;padding:3px;background:#fff;display:flex;gap:3px;max-width:560px;margin-top:10px}
+.progress i{flex:1;background:var(--title1)}.progress i.off{opacity:.12}
+.taskbar{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;gap:8px;padding:4px 6px calc(4px + env(safe-area-inset-bottom,0px));z-index:5;color:#000}
+.start{font:700 22px 'VT323',monospace;padding:2px 12px;display:flex;gap:6px;align-items:center;cursor:pointer}
+.start s{width:16px;height:16px;background:conic-gradient(var(--a2) 0 25%,var(--a3) 0 50%,var(--a4) 0 75%,var(--a1) 0)}
+.task{padding:2px 14px;font-size:20px;flex:0 1 240px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.clock{margin-left:auto;padding:2px 12px;font-size:20px}
+@media (max-width:560px){.tab{font-size:17px;padding:5px 9px 3px}.dlg .body{font-size:22px}}
+</style>
+</head>
+<body>
+<main class="window bevel">
+  <div class="titlebar"><span class="folder"></span><span class="px">Bakeep - Gestor de Finanzas</span><span class="ctrl"><b class="bevel">_</b><b class="bevel">&#9633;</b><b class="bevel">X</b></span></div>
+  <div class="tabs">
+    <button class="tab on" data-v="inicio">Inicio</button>
+    <button class="tab" data-v="registro">Registro mensual</button>
+    <button class="tab" data-v="metas">Metas Ahorro</button>
+    <button class="tab" data-v="resumen">Resumen Finanzas</button>
+  </div>
+  <section class="panel">
+
+    <div class="view on" id="inicio">
+      <h1>Bakeep</h1>
+      <form class="search" id="sf"><input id="q" type="text" placeholder="Tu herramienta para..." aria-label="Buscar sección"><button class="btn bevel" aria-label="Buscar">&#9906;</button></form>
+      <div class="dialogs">
+        <button class="dlg bevel" data-go="registro" style="--c:#005f73;--c2:#2ec4b6;--ic:#2ec4b6"><div class="titlebar"><span class="px">Finanzas.exe</span></div><div class="body"><span class="ico">$</span><span>Control de tus Finanzas</span></div></button>
+        <button class="dlg bevel" data-go="metas" style="--c:#c2410c;--c2:#ff6b35;--ic:#ff6b35"><div class="titlebar"><span class="px">Metas.exe</span></div><div class="body"><span class="ico">&#9733;</span><span>Metas de Ahorro</span></div></button>
+        <button class="dlg bevel" data-go="resumen" style="--c:#4338ca;--c2:#5b5fef;--ic:#5b5fef"><div class="titlebar"><span class="px">Todo.exe</span></div><div class="body"><span class="ico">&#9776;</span><span>Todo en un mismo lugar</span></div></button>
+      </div>
+    </div>
+
+    <div class="view" id="registro">
+      <h2>Registro mensual</h2>
+      <p class="lead">Selecciona el mes y registra tus valores.</p>
+      <label for="mes">Mes</label>
+      <select id="mes"></select>
+      <div class="grid3">
+        <div><label for="ing">Ingresos del mes ($)</label><input id="ing" type="number" min="0" step="any" inputmode="decimal"></div>
+        <div><label for="fij">Gastos fijos ($)<small>Arriendo, cuentas</small></label><input id="fij" type="number" min="0" step="any" inputmode="decimal"></div>
+        <div><label for="hor">Gastos hormiga ($)<small>Snacks, café, suscripciones</small></label><input id="hor" type="number" min="0" step="any" inputmode="decimal"></div>
+      </div>
+      <button class="btn bevel" id="guardar">Guardar datos del mes</button>
+      <div class="msg bevel ok" id="msgReg" hidden><span class="ico">&#10003;</span><span id="msgRegT"></span></div>
+    </div>
+
+    <div class="view" id="metas">
+      <h2>Metas de ahorro</h2>
+      <p class="lead">Define tu meta y cuánto vas a destinar para calcular en cuánto tiempo la alcanzas.</p>
+      <label for="meta">Meta de ahorro total ($)</label>
+      <input id="meta" type="number" min="0" step="any" inputmode="decimal" style="max-width:520px">
+      <h3>¿Cuánto vas a destinar al ahorro?</h3>
+      <select id="modo" style="max-width:520px">
+        <option value="promedio">Todo mi balance promedio</option>
+        <option value="fijo">Un monto fijo cada mes</option>
+        <option value="pct">Un porcentaje de mi balance promedio</option>
+        <option value="mes">Un monto distinto por cada mes</option>
+      </select>
+      <div id="pFijo" hidden style="margin-top:14px;max-width:520px"><label for="fijo">Monto fijo que ahorras cada mes ($)</label><input id="fijo" type="number" min="0" step="any" inputmode="decimal"></div>
+      <div id="pPct" hidden style="margin-top:14px;max-width:520px"><label for="pct">Porcentaje de tu balance promedio que destinas (%)<small>Del dinero que te sobra cada mes, cuánto va a la meta</small></label><input id="pct" type="number" min="0" max="100" step="any" inputmode="decimal"></div>
+      <div id="pMes" hidden style="margin-top:14px">
+        <div class="grid2" style="max-width:520px"><div><label for="ames">Mes</label><select id="ames"></select></div><div><label for="amonto">Monto que destinas ese mes ($)</label><input id="amonto" type="number" min="0" step="any" inputmode="decimal"></div></div>
+        <div class="tw sunk" style="max-width:520px"><table style="min-width:0"><thead><tr><th>Mes</th><th>Balance</th><th>Aporte</th></tr></thead><tbody id="tAportes"></tbody></table></div>
+        <p style="font-size:18px;opacity:.8;margin:6px 0 0">El signo ! marca los meses en que destinas más de lo que te sobró.</p>
+      </div>
+      <p id="promAh" style="margin-top:18px"></p>
+      <div class="msg bevel info" id="msgMeta"><span class="ico">i</span><span id="msgMetaT"></span></div>
+      <p style="margin:14px 0 0">Avance de la meta en 12 meses:</p>
+      <div class="progress sunk" id="bar"></div>
+    </div>
+
+    <div class="view" id="resumen">
+      <h2>Resumen anual y análisis</h2>
+      <p class="lead">Matriz de gastos G (2 x 12), gasto total T = G fijos + G hormiga y balance B = I - T.</p>
+      <div class="tw sunk"><table><thead><tr><th>Mes</th><th>Ingresos</th><th>G. fijos</th><th>G. hormiga</th><th>G. total</th><th>Balance</th></tr></thead><tbody id="tbody"></tbody></table></div>
+      <div class="metrics" id="metrics"></div>
+      <h3>Tendencia de gastos (sucesión)</h3>
+      <div class="chart sunk"><svg id="chart" viewBox="0 0 700 280" role="img" aria-label="Gráfico de gastos por mes"></svg>
+        <div class="legend"><span><i style="background:var(--a3)"></i>Fijos</span><span><i style="background:var(--a2)"></i>Hormiga</span><span><i style="background:var(--a4)"></i>Total</span></div></div>
+      <h3>Variación porcentual entre meses</h3>
+      <div class="grid2">
+        <div><label for="ma">Mes base (k)</label><select id="ma"></select></div>
+        <div><label for="mb">Mes a comparar (j)</label><select id="mb"></select></div>
+      </div>
+      <div class="formula">Variación % = (T<sub>j</sub> - T<sub>k</sub>) / T<sub>k</sub> x 100</div>
+      <div class="msg bevel info" id="msgVar"><span class="ico">i</span><span id="msgVarT"></span></div>
+    </div>
+
+  </section>
+</main>
+<div class="taskbar bevel">
+  <button class="start bevel" data-go="inicio"><s></s>Inicio</button>
+  <div class="task sunk" id="taskname">Bakeep</div>
+  <div class="clock sunk" id="clk">12:00</div>
+</div>
+
+<script>
+var MESES=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+var KEY="bakeep:v1", S={datos:{},meta:0};
+MESES.forEach(function(m){S.datos[m]={ingresos:0,gastos_fijos:0,gastos_hormiga:0}});
+try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);if(p&&p.datos){S=p}}}catch(e){}
+if(!S.modo)S.modo='promedio';if(S.fijo==null)S.fijo=0;if(S.pct==null)S.pct=100;
+if(!S.aportes){S.aportes={};MESES.forEach(function(m){S.aportes[m]=0})}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function $(id){return document.getElementById(id)}
+function fmt(n){return "$"+n.toLocaleString("es-CL",{maximumFractionDigits:2})}
+function num(v){var n=parseFloat(v);return isNaN(n)||n<0?0:n}
+function msg(id,kind,text,icon){var b=$(id);b.className="msg bevel "+kind;b.querySelector(".ico").textContent=icon;b.querySelector("span:last-child").textContent=text;b.hidden=false}
+var ICON={ok:"\u2713",warn:"!",err:"X",info:"i"};
+
+/* Navegación */
+var NAMES={inicio:"Bakeep - Welcome",registro:"Registro mensual",metas:"Metas Ahorro",resumen:"Resumen Finanzas"};
+function go(v){
+  document.querySelectorAll(".view").forEach(function(x){x.classList.toggle("on",x.id===v)});
+  document.querySelectorAll(".tab").forEach(function(x){x.classList.toggle("on",x.dataset.v===v)});
+  $("taskname").textContent=NAMES[v];
+  if(v==="registro")fillReg();if(v==="metas"){fillMeta();renderMeta()}if(v==="resumen")renderResumen();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll("[data-v],[data-go]").forEach(function(el){el.addEventListener("click",function(){go(el.dataset.v||el.dataset.go)})});
+$("sf").addEventListener("submit",function(e){e.preventDefault();var q=$("q").value.toLowerCase();
+  var map={finanz:"registro",registr:"registro",gast:"registro",meta:"metas",ahorr:"metas",resum:"resumen",grafic:"resumen"};
+  for(var k in map){if(q.indexOf(k)>-1){go(map[k]);return}}});
+
+/* Selects de meses */
+["mes","ma","mb","ames"].forEach(function(id){MESES.forEach(function(m){var o=document.createElement("option");o.value=o.textContent=m;$(id).appendChild(o)})});
+$("mb").selectedIndex=1;
+
+/* Registro mensual */
+function fillReg(){var d=S.datos[$("mes").value];$("ing").value=d.ingresos;$("fij").value=d.gastos_fijos;$("hor").value=d.gastos_hormiga;$("msgReg").hidden=true}
+$("mes").addEventListener("change",fillReg);
+$("guardar").addEventListener("click",function(){
+  var m=$("mes").value;
+  S.datos[m]={ingresos:num($("ing").value),gastos_fijos:num($("fij").value),gastos_hormiga:num($("hor").value)};
+  save();msg("msgReg","ok","\u00a1Datos de "+m+" guardados correctamente!",ICON.ok);
+});
+
+/* Cálculos (vectores y matriz) */
+function calc(){
+  var I=MESES.map(function(m){return S.datos[m].ingresos});
+  var G=[MESES.map(function(m){return S.datos[m].gastos_fijos}),MESES.map(function(m){return S.datos[m].gastos_hormiga})];
+  var T=I.map(function(_,j){return G[0][j]+G[1][j]});
+  var B=I.map(function(v,j){return v-T[j]});
+  var sum=function(a){return a.reduce(function(x,y){return x+y},0)};
+  return {I:I,G:G,T:T,B:B,sum:sum};
+}
+
+/* Metas */
+function fillMeta(){
+  $('meta').value=S.meta;$('modo').value=S.modo;$('fijo').value=S.fijo;$('pct').value=S.pct;$('amonto').value=S.aportes[$('ames').value]||0;
+  $('pFijo').hidden=S.modo!=='fijo';$('pPct').hidden=S.modo!=='pct';$('pMes').hidden=S.modo!=='mes';
+}
+function drawAportes(c){
+  $('tAportes').innerHTML=MESES.map(function(m,j){
+    var a=S.aportes[m]||0,over=a>0&&c.I[j]>0&&a>c.B[j];
+    return '<tr><td>'+m+'</td><td class="'+(c.B[j]<0?'neg':'pos')+'">'+fmt(c.B[j])+'</td><td class="'+(over?'neg':'')+'">'+fmt(a)+(over?' !':'')+'</td></tr>';
+  }).join('');
+}
+function renderMeta(){
+  var c=calc(),prom=c.sum(c.B)/12,meta=S.meta,kind='info',txt='',pct=0,hayDatos=c.sum(c.I)>0;
+  if(S.modo==='mes'){
+    drawAportes(c);
+    var ap=MESES.map(function(m){return S.aportes[m]||0}),tot=c.sum(ap),acc=0,hit=-1;
+    ap.forEach(function(v,j){acc+=v;if(hit<0&&meta>0&&acc>=meta)hit=j});
+    var act=ap.filter(function(v){return v>0});
+    $('promAh').innerHTML='Total que destinas en los 12 meses: <b>'+fmt(tot)+'</b>';
+    pct=meta>0?tot/meta:0;
+    if(meta<=0){txt='Ingresa una meta de ahorro válida arriba para calcular el plazo.'}
+    else if(hit>=0){kind='ok';txt='Con tus aportes por mes alcanzarás tu meta de '+fmt(meta)+' en '+MESES[hit]+' (mes '+(hit+1)+').'}
+    else if(act.length){var pm=tot/act.length;kind='warn';txt='En los 12 meses se juntan '+fmt(tot)+' de '+fmt(meta)+'. Si sigues aportando en promedio '+fmt(pm)+' por mes, te faltarían '+Math.ceil((meta-tot)/pm)+' meses más después de diciembre.'}
+    else{kind='err';txt='Aún no hay aportes. Elige un mes y escribe cuánto vas a destinar.'}
+  }else{
+    var a=S.modo==='fijo'?S.fijo:S.modo==='pct'?Math.max(0,prom)*S.pct/100:prom;
+    $('promAh').innerHTML='Balance mensual promedio: <b>'+fmt(prom)+'</b> &middot; Aporte mensual a la meta: <b>'+fmt(a)+'</b>';
+    if(meta<=0){txt='Ingresa una meta de ahorro válida arriba para calcular el plazo.'}
+    else if(a<=0){kind='err';txt=S.modo==='fijo'?'Ingresa un monto mensual mayor a $0 para calcular el plazo.':'Tu balance mensual promedio es cero o negativo. Debes reducir tus gastos o aumentar tus ingresos para poder ahorrar.'}
+    else{
+      var n=meta/a;kind='ok';pct=Math.min(1,12*a/meta);
+      txt='Aportando '+fmt(a)+' al mes, alcanzarás tu meta de '+fmt(meta)+' en aproximadamente '+n.toFixed(1)+' meses ('+Math.ceil(n)+' meses completos).';
+      if(S.modo==='fijo'&&hayDatos&&a>Math.max(prom,0)){kind='warn';txt+=' Ojo: es más de lo que te sobra en promedio ('+fmt(prom)+').'}
+    }
+  }
+  msg('msgMeta',kind,txt,ICON[kind]);
+  var bar=$('bar'),fill=Math.min(8,Math.round(Math.min(1,pct)*8));bar.innerHTML='';
+  for(var i=0;i<8;i++){bar.innerHTML+='<i class="'+(i<fill?'':'off')+'"></i>'}
+}
+$('meta').addEventListener('input',function(){S.meta=num(this.value);save();renderMeta()});
+$('modo').addEventListener('change',function(){S.modo=this.value;save();fillMeta();renderMeta()});
+$('fijo').addEventListener('input',function(){S.fijo=num(this.value);save();renderMeta()});
+$('pct').addEventListener('input',function(){S.pct=Math.min(100,num(this.value));save();renderMeta()});
+$('ames').addEventListener('change',function(){$('amonto').value=S.aportes[this.value]||0});
+$('amonto').addEventListener('input',function(){S.aportes[$('ames').value]=num(this.value);save();renderMeta()});
+
+/* Resumen */
+function renderResumen(){
+  var c=calc(),tb="";
+  MESES.forEach(function(m,j){
+    tb+="<tr><td>"+m+"</td><td>"+fmt(c.I[j])+"</td><td>"+fmt(c.G[0][j])+"</td><td>"+fmt(c.G[1][j])+"</td><td>"+fmt(c.T[j])+'</td><td class="'+(c.B[j]<0?"neg":"pos")+'">'+fmt(c.B[j])+"</td></tr>";
+  });
+  $("tbody").innerHTML=tb;
+  var gA=c.sum(c.T),iA=c.sum(c.I),bA=iA-gA;
+  var mets=[["Ingreso anual total",fmt(iA)],["Gasto anual total",fmt(gA)],["Balance anual",fmt(bA)],["Gasto promedio mensual",fmt(gA/12)]];
+  $("metrics").innerHTML=mets.map(function(x){return '<div class="metric bevel"><span>'+x[0]+"</span><b>"+x[1]+"</b></div>"}).join("");
+  drawChart(c);renderVar(c);
+}
+function drawChart(c){
+  var W=700,H=280,L=56,R=14,T=14,Bm=34,max=Math.max.apply(null,c.T.concat(c.G[0],c.G[1],[1]));
+  var x=function(j){return L+j*(W-L-R)/11},y=function(v){return H-Bm-v/max*(H-T-Bm)};
+  var s="";
+  for(var k=0;k<=4;k++){var v=max*k/4,yy=y(v);
+    s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+yy+'" y2="'+yy+'" style="stroke:var(--sh);stroke-dasharray:3 3"/><text x="'+(L-6)+'" y="'+(yy+5)+'" text-anchor="end" style="fill:var(--ink);font:15px VT323,monospace">'+Math.round(v).toLocaleString("es-CL")+"</text>";}
+  MESES.forEach(function(m,j){s+='<text x="'+x(j)+'" y="'+(H-12)+'" text-anchor="middle" style="fill:var(--ink);font:15px VT323,monospace">'+m.slice(0,3)+"</text>"});
+  [[c.G[0],"--a3"],[c.G[1],"--a2"],[c.T,"--a4"]].forEach(function(sr){
+    var pts=sr[0].map(function(v,j){return x(j)+","+y(v)}).join(" ");
+    s+='<polyline points="'+pts+'" style="fill:none;stroke:var('+sr[1]+');stroke-width:3"/>';
+    sr[0].forEach(function(v,j){s+='<rect x="'+(x(j)-3)+'" y="'+(y(v)-3)+'" width="6" height="6" style="fill:var('+sr[1]+');stroke:#000;stroke-width:1"/>'});
+  });
+  $("chart").innerHTML=s;
+}
+function renderVar(c){
+  var a=MESES.indexOf($("ma").value),b=MESES.indexOf($("mb").value),tk=c.T[a],tj=c.T[b];
+  if(tk>0){
+    var v=(tj-tk)/tk*100;
+    if(v>0)msg("msgVar","warn","Gastaste un "+v.toFixed(2)+"% más en "+MESES[b]+" en comparación con "+MESES[a]+".",ICON.warn);
+    else if(v<0)msg("msgVar","ok","Gastaste un "+Math.abs(v).toFixed(2)+"% menos (\u00a1bien!) en "+MESES[b]+" en comparación con "+MESES[a]+".",ICON.ok);
+    else msg("msgVar","info","Los gastos totales fueron exactamente iguales en ambos meses.",ICON.info);
+  }else msg("msgVar","info","El mes base tiene un gasto total de $0, por lo que no se puede calcular el porcentaje.",ICON.info);
+}
+["ma","mb"].forEach(function(id){$(id).addEventListener("change",function(){renderVar(calc())})});
+
+function tick(){var d=new Date();$("clk").textContent=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")}
+tick();setInterval(tick,30000);fillReg();
+</script>
+</body>
+</html>
