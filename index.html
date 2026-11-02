@@ -58,7 +58,7 @@ label small{display:block;font-size:18px;opacity:.75}
 .msg.ok .ico{--ic:#1b7a3a}.msg.warn .ico{--ic:#e09f00}.msg.err .ico{--ic:#c1121f}.msg.info .ico{--ic:#1084d0}
 [hidden]{display:none!important}
 .tw{overflow-x:auto;max-width:100%}
-table{border-collapse:collapse;width:100%;min-width:560px;font-size:20px;background:var(--cell)}
+table{border-collapse:collapse;width:100%;min-width:820px;font-size:20px;background:var(--cell)}
 th{background:var(--title1);color:#fff;font-weight:400;padding:4px 8px;text-align:right;white-space:nowrap}
 th:first-child,td:first-child{text-align:left}
 td{padding:3px 8px;text-align:right;border-bottom:1px solid var(--sh)}
@@ -81,20 +81,30 @@ tbody tr:nth-child(even){background:var(--cellalt)}
 .task{padding:2px 14px;font-size:20px;flex:0 1 240px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .clock{margin-left:auto;padding:2px 12px;font-size:20px}
 @media (max-width:560px){.tab{font-size:17px;padding:5px 9px 3px}.dlg .body{font-size:22px}}
+.gl{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px;margin-top:14px}
+.term{padding:10px 12px;color:#000}.term b{display:block;font:400 12px/1.5 'Press Start 2P',monospace;color:var(--brand);margin-bottom:6px}.term i{display:block;margin-top:6px;font-style:normal;opacity:.8;font-size:20px}
+.acc{max-width:440px;margin:0 auto;padding:3px;color:#000;box-shadow:5px 5px 0 rgba(0,0,0,.25),inset -1px -1px 0 var(--sh),inset 1px 1px 0 #dfdfdf}
+.acc .in{padding:16px 16px 18px}.acc .titlebar .px{font-size:9px}.acc label{margin-top:10px}
+.stabs{display:flex;gap:6px;margin-bottom:8px}.stabs .btn{flex:1;padding:4px 6px}.stabs .btn.on{border-color:var(--dk) var(--hi) var(--hi) var(--dk);background:var(--a3);font-weight:bold}
+.sep{text-align:center;margin:14px 0;opacity:.7}
+.gbtn{width:100%;font:inherit;font-size:21px;padding:6px 10px;cursor:pointer;display:flex;gap:10px;align-items:center;justify-content:center;color:#000}
+.gbtn b{font:700 18px Arial,sans-serif;background:#fff;border:2px solid #000;width:26px;height:26px;display:grid;place-items:center;color:#4285f4}
+.note{font-size:18px;opacity:.75;margin:12px 0 0}
 </style>
 </head>
 <body>
 <main class="window bevel">
   <div class="titlebar"><span class="folder"></span><span class="px">Bakeep - Gestor de Finanzas</span><span class="ctrl"><b class="bevel">_</b><b class="bevel">&#9633;</b><b class="bevel">X</b></span></div>
-  <div class="tabs">
+  <div class="tabs" hidden>
     <button class="tab on" data-v="inicio">Inicio</button>
     <button class="tab" data-v="registro">Registro mensual</button>
     <button class="tab" data-v="metas">Metas Ahorro</button>
     <button class="tab" data-v="resumen">Resumen Finanzas</button>
+    <button class="tab" data-v="glosario">Glosario</button>
   </div>
   <section class="panel">
 
-    <div class="view on" id="inicio">
+    <div class="view" id="inicio">
       <h1>Bakeep</h1>
       <form class="search" id="sf"><input id="q" type="text" placeholder="Tu herramienta para..." aria-label="Buscar sección"><button class="btn bevel" aria-label="Buscar">&#9906;</button></form>
       <div class="dialogs">
@@ -102,15 +112,17 @@ tbody tr:nth-child(even){background:var(--cellalt)}
         <button class="dlg bevel" data-go="metas" style="--c:#c2410c;--c2:#ff6b35;--ic:#ff6b35"><div class="titlebar"><span class="px">Metas.exe</span></div><div class="body"><span class="ico">&#9733;</span><span>Metas de Ahorro</span></div></button>
         <button class="dlg bevel" data-go="resumen" style="--c:#4338ca;--c2:#5b5fef;--ic:#5b5fef"><div class="titlebar"><span class="px">Todo.exe</span></div><div class="body"><span class="ico">&#9776;</span><span>Todo en un mismo lugar</span></div></button>
       </div>
+      <p style='text-align:center;margin:28px 0 0'>¿Primera vez? <button class='btn bevel' data-go='glosario'>Mira el glosario</button></p>
     </div>
 
     <div class="view" id="registro">
       <h2>Registro mensual</h2>
-      <p class="lead">Selecciona el mes y registra tus valores.</p>
+      <p class='lead'>Selecciona el mes y registra tus valores. ¿Dudas con algún término? <button class='btn bevel' data-go='glosario' style='padding:0 10px;font-size:19px'>Ver glosario</button></p>
       <label for="mes">Mes</label>
       <select id="mes"></select>
       <div class="grid3">
-        <div><label for="ing">Ingresos del mes ($)</label><input id="ing" type="number" min="0" step="any" inputmode="decimal"></div>
+        <div><label for='ing'>Ingreso fijo ($)<small>Sueldo, mesada, pensión</small></label><input id='ing' type='number' min='0' step='any' inputmode='decimal'></div>
+        <div><label for='ext'>Ingreso extraordinario ($)<small>Bono, venta de algo, regalo, trabajo puntual</small></label><input id='ext' type='number' min='0' step='any' inputmode='decimal'></div>
         <div><label for="fij">Gastos fijos ($)<small>Arriendo, cuentas</small></label><input id="fij" type="number" min="0" step="any" inputmode="decimal"></div>
         <div><label for="hor">Gastos hormiga ($)<small>Snacks, café, suscripciones</small></label><input id="hor" type="number" min="0" step="any" inputmode="decimal"></div>
       </div>
@@ -145,8 +157,8 @@ tbody tr:nth-child(even){background:var(--cellalt)}
 
     <div class="view" id="resumen">
       <h2>Resumen anual y análisis</h2>
-      <p class="lead">Matriz de gastos G (2 x 12), gasto total T = G fijos + G hormiga y balance B = I - T.</p>
-      <div class="tw sunk"><table><thead><tr><th>Mes</th><th>Ingresos</th><th>G. fijos</th><th>G. hormiga</th><th>G. total</th><th>Balance</th></tr></thead><tbody id="tbody"></tbody></table></div>
+      <p class='lead'>Matrices de ingresos F y de gastos G (ambas de 2 x 12): ingreso total I = F fijo + F extraordinario, gasto total T = G fijos + G hormiga y balance B = I - T.</p>
+      <div class="tw sunk"><table><thead><tr><th>Mes</th><th>Ing. fijo</th><th>Ing. extra</th><th>Ing. total</th><th>G. fijos</th><th>G. hormiga</th><th>G. total</th><th>Balance</th></tr></thead><tbody id="tbody"></tbody></table></div>
       <div class="metrics" id="metrics"></div>
       <h3>Tendencia de gastos (sucesión)</h3>
       <div class="chart sunk"><svg id="chart" viewBox="0 0 700 280" role="img" aria-label="Gráfico de gastos por mes"></svg>
@@ -160,22 +172,65 @@ tbody tr:nth-child(even){background:var(--cellalt)}
       <div class="msg bevel info" id="msgVar"><span class="ico">i</span><span id="msgVarT"></span></div>
     </div>
 
+    <div class='view' id='glosario'>
+      <h2>Glosario</h2>
+      <p class='lead'>Si es tu primera vez, aquí se explica qué significa cada concepto.</p>
+      <div class='gl'>
+        <div class='term bevel'><b>Ingreso fijo</b>Dinero que recibes de forma regular y estable, más o menos el mismo monto cada mes.<i>Ej: sueldo, mesada, pensión, arriendo que cobras.</i></div>
+        <div class='term bevel'><b>Ingreso extraordinario</b>Dinero que recibes de forma ocasional, que no estaba presupuestado y no se repite todos los meses. No forma parte del ingreso fijo.<i>Ej: bono, venta de algo que ya no usabas, regalo en dinero, devolución de impuestos, trabajo puntual.</i></div>
+        <div class='term bevel'><b>Gasto fijo</b>Gasto obligatorio que se repite cada mes con un monto parecido.<i>Ej: arriendo o dividendo, luz, agua, internet, cuotas de créditos, transporte.</i></div>
+        <div class='term bevel'><b>Gasto hormiga</b>Gastos pequeños y frecuentes que casi no se notan, pero que sumados en el mes pesan en tu presupuesto.<i>Ej: café, snacks, delivery, suscripciones, propinas.</i></div>
+        <div class='term bevel'><b>Ingreso total</b>Ingreso fijo + ingreso extraordinario del mes.</div>
+        <div class='term bevel'><b>Gasto total</b>Gastos fijos + gastos hormiga del mes.</div>
+        <div class='term bevel'><b>Balance mensual</b>Lo que te sobra o te falta: ingreso total - gasto total. Si es positivo puedes ahorrar; si es negativo gastaste más de lo que ingresó.</div>
+        <div class='term bevel'><b>Meta de ahorro</b>Monto que quieres juntar para un objetivo, como un viaje, una emergencia o una compra.</div>
+        <div class='term bevel'><b>Aporte mensual</b>La parte del dinero que te sobra que decides destinar a tu meta de ahorro.</div>
+        <div class='term bevel'><b>Variación porcentual</b>Cuánto subió o bajó tu gasto de un mes respecto de otro, expresado en %.</div>
+        <div class='term bevel'><b>Matriz</b>Tabla ordenada de números en filas y columnas. En Bakeep, ingresos y gastos se ordenan en matrices de 2 filas x 12 meses y se suman por columna.</div>
+      </div>
+    </div>
+
+    <div class='view on' id='acceso'>
+      <h1 style='font-size:clamp(28px,7vw,56px)'>Bakeep</h1>
+      <div class='acc bevel'>
+        <div class='titlebar'><span class='px'>Acceso.exe</span></div>
+        <div class='in'>
+          <div class='stabs'><button class='btn bevel on' id='tLogin'>Iniciar sesión</button><button class='btn bevel' id='tReg'>Crear cuenta</button></div>
+          <label for='aem'>Correo electrónico</label><input id='aem' type='email' autocomplete='email'>
+          <label for='apw'>Contraseña</label><input id='apw' type='password' autocomplete='current-password'>
+          <div id='rowPw2' hidden><label for='apw2'>Repite la contraseña</label><input id='apw2' type='password' autocomplete='new-password'></div>
+          <button class='btn bevel' id='asub' style='margin-top:16px;width:100%'>Entrar</button>
+          <div class='sep'>— o —</div>
+          <button class='gbtn bevel' id='gbtn'><b>G</b>Continuar con Google</button>
+          <div id='gbox' class='bevel' hidden style='padding:10px;margin-top:12px'>
+            <label for='gem'>Correo de tu cuenta de Google</label><input id='gem' type='email' placeholder='tucorreo@gmail.com'>
+            <div style='display:flex;gap:8px;margin-top:10px'><button class='btn bevel' id='gok'>Continuar</button><button class='btn bevel' id='gcancel'>Cancelar</button></div>
+          </div>
+          <div class='msg bevel err' id='msgAcc' hidden><span class='ico'>X</span><span></span></div>
+          <p class='note'>Modo demostración: las cuentas y los datos se guardan solo en este navegador. El acceso con Google es una simulación.</p>
+        </div>
+      </div>
+    </div>
   </section>
 </main>
 <div class="taskbar bevel">
   <button class="start bevel" data-go="inicio"><s></s>Inicio</button>
   <div class="task sunk" id="taskname">Bakeep</div>
+  <div class='task sunk' id='usr' hidden></div><button class='btn bevel' id='salir' hidden style='padding:0 12px'>Salir</button>
   <div class="clock sunk" id="clk">12:00</div>
 </div>
 
 <script>
 var MESES=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-var KEY="bakeep:v1", S={datos:{},meta:0};
-MESES.forEach(function(m){S.datos[m]={ingresos:0,gastos_fijos:0,gastos_hormiga:0}});
-try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);if(p&&p.datos){S=p}}}catch(e){}
-if(!S.modo)S.modo='promedio';if(S.fijo==null)S.fijo=0;if(S.pct==null)S.pct=100;
-if(!S.aportes){S.aportes={};MESES.forEach(function(m){S.aportes[m]=0})}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+var KEY=null,USER=null,S=null;
+function newState(){var s={datos:{},meta:0,modo:'promedio',fijo:0,pct:100,aportes:{}};MESES.forEach(function(m){s.datos[m]={ingresos:0,extra:0,gastos_fijos:0,gastos_hormiga:0};s.aportes[m]=0});return s}
+function loadData(email){
+  KEY='bakeep:data:'+email;S=newState();
+  try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);if(p&&p.datos){S=p}}}catch(e){}
+  if(!S.modo)S.modo='promedio';if(S.fijo==null)S.fijo=0;if(S.pct==null)S.pct=100;if(!S.aportes)S.aportes={};
+  MESES.forEach(function(m){if(S.aportes[m]==null)S.aportes[m]=0;if(!S.datos[m])S.datos[m]={ingresos:0,extra:0,gastos_fijos:0,gastos_hormiga:0};if(S.datos[m].extra==null)S.datos[m].extra=0});
+}
+function save(){if(!KEY)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function $(id){return document.getElementById(id)}
 function fmt(n){return "$"+n.toLocaleString("es-CL",{maximumFractionDigits:2})}
 function num(v){var n=parseFloat(v);return isNaN(n)||n<0?0:n}
@@ -183,8 +238,9 @@ function msg(id,kind,text,icon){var b=$(id);b.className="msg bevel "+kind;b.quer
 var ICON={ok:"\u2713",warn:"!",err:"X",info:"i"};
 
 /* Navegación */
-var NAMES={inicio:"Bakeep - Welcome",registro:"Registro mensual",metas:"Metas Ahorro",resumen:"Resumen Finanzas"};
+var NAMES={inicio:"Bakeep - Welcome",registro:"Registro mensual",metas:"Metas Ahorro",resumen:"Resumen Finanzas",glosario:"Glosario",acceso:"Acceso"};
 function go(v){
+  if(!USER)v="acceso";
   document.querySelectorAll(".view").forEach(function(x){x.classList.toggle("on",x.id===v)});
   document.querySelectorAll(".tab").forEach(function(x){x.classList.toggle("on",x.dataset.v===v)});
   $("taskname").textContent=NAMES[v];
@@ -201,22 +257,23 @@ $("sf").addEventListener("submit",function(e){e.preventDefault();var q=$("q").va
 $("mb").selectedIndex=1;
 
 /* Registro mensual */
-function fillReg(){var d=S.datos[$("mes").value];$("ing").value=d.ingresos;$("fij").value=d.gastos_fijos;$("hor").value=d.gastos_hormiga;$("msgReg").hidden=true}
+function fillReg(){var d=S.datos[$("mes").value];$("ing").value=d.ingresos;$("ext").value=d.extra||0;$("fij").value=d.gastos_fijos;$("hor").value=d.gastos_hormiga;$("msgReg").hidden=true}
 $("mes").addEventListener("change",fillReg);
 $("guardar").addEventListener("click",function(){
   var m=$("mes").value;
-  S.datos[m]={ingresos:num($("ing").value),gastos_fijos:num($("fij").value),gastos_hormiga:num($("hor").value)};
+  S.datos[m]={ingresos:num($("ing").value),extra:num($("ext").value),gastos_fijos:num($("fij").value),gastos_hormiga:num($("hor").value)};
   save();msg("msgReg","ok","\u00a1Datos de "+m+" guardados correctamente!",ICON.ok);
 });
 
 /* Cálculos (vectores y matriz) */
 function calc(){
-  var I=MESES.map(function(m){return S.datos[m].ingresos});
+  var F=[MESES.map(function(m){return S.datos[m].ingresos||0}),MESES.map(function(m){return S.datos[m].extra||0})];
+  var I=F[0].map(function(_,j){return F[0][j]+F[1][j]});
   var G=[MESES.map(function(m){return S.datos[m].gastos_fijos}),MESES.map(function(m){return S.datos[m].gastos_hormiga})];
   var T=I.map(function(_,j){return G[0][j]+G[1][j]});
   var B=I.map(function(v,j){return v-T[j]});
   var sum=function(a){return a.reduce(function(x,y){return x+y},0)};
-  return {I:I,G:G,T:T,B:B,sum:sum};
+  return {F:F,I:I,G:G,T:T,B:B,sum:sum};
 }
 
 /* Metas */
@@ -269,11 +326,11 @@ $('amonto').addEventListener('input',function(){S.aportes[$('ames').value]=num(t
 function renderResumen(){
   var c=calc(),tb="";
   MESES.forEach(function(m,j){
-    tb+="<tr><td>"+m+"</td><td>"+fmt(c.I[j])+"</td><td>"+fmt(c.G[0][j])+"</td><td>"+fmt(c.G[1][j])+"</td><td>"+fmt(c.T[j])+'</td><td class="'+(c.B[j]<0?"neg":"pos")+'">'+fmt(c.B[j])+"</td></tr>";
+    tb+="<tr><td>"+m+"</td><td>"+fmt(c.F[0][j])+"</td><td>"+fmt(c.F[1][j])+"</td><td>"+fmt(c.I[j])+"</td><td>"+fmt(c.G[0][j])+"</td><td>"+fmt(c.G[1][j])+"</td><td>"+fmt(c.T[j])+'</td><td class="'+(c.B[j]<0?"neg":"pos")+'">'+fmt(c.B[j])+"</td></tr>";
   });
   $("tbody").innerHTML=tb;
   var gA=c.sum(c.T),iA=c.sum(c.I),bA=iA-gA;
-  var mets=[["Ingreso anual total",fmt(iA)],["Gasto anual total",fmt(gA)],["Balance anual",fmt(bA)],["Gasto promedio mensual",fmt(gA/12)]];
+  var mets=[["Ingreso anual total",fmt(iA)],["Ingresos extraordinarios del año",fmt(c.sum(c.F[1]))],["Gasto anual total",fmt(gA)],["Balance anual",fmt(bA)],["Gasto promedio mensual",fmt(gA/12)]];
   $("metrics").innerHTML=mets.map(function(x){return '<div class="metric bevel"><span>'+x[0]+"</span><b>"+x[1]+"</b></div>"}).join("");
   drawChart(c);renderVar(c);
 }
@@ -302,8 +359,71 @@ function renderVar(c){
 }
 ["ma","mb"].forEach(function(id){$(id).addEventListener("change",function(){renderVar(calc())})});
 
+/* Acceso de usuarios (prototipo: cuentas guardadas solo en este navegador) */
+var USERS={},modoAcc='login';
+try{USERS=JSON.parse(localStorage.getItem('bakeep:users')||'{}')||{}}catch(e){USERS={}}
+function saveUsers(){try{localStorage.setItem('bakeep:users',JSON.stringify(USERS))}catch(e){}}
+function hex(b){return Array.prototype.map.call(new Uint8Array(b),function(x){return ('0'+x.toString(16)).slice(-2)}).join('')}
+function hashPw(pw,salt){
+  var fb=function(){return 'b64'+btoa(unescape(encodeURIComponent(salt+pw)))};
+  try{
+    var enc=new TextEncoder();
+    return crypto.subtle.importKey('raw',enc.encode(pw),'PBKDF2',false,['deriveBits']).then(function(k){
+      return crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode(salt),iterations:100000,hash:'SHA-256'},k,256)
+    }).then(hex).catch(fb);
+  }catch(e){return Promise.resolve(fb())}
+}
+function randSalt(){var a=new Uint8Array(8);try{crypto.getRandomValues(a)}catch(e){for(var i=0;i<8;i++)a[i]=Math.floor(Math.random()*256)}return Array.prototype.join.call(a,'-')}
+function okEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)}
+function setModoAcc(m){
+  modoAcc=m;$('tLogin').classList.toggle('on',m==='login');$('tReg').classList.toggle('on',m==='reg');
+  $('rowPw2').hidden=m!=='reg';$('asub').textContent=m==='reg'?'Crear cuenta':'Entrar';$('msgAcc').hidden=true;
+}
+function sesionUI(){
+  var on=!!USER;document.querySelector('.tabs').hidden=!on;$('usr').hidden=!on;$('salir').hidden=!on;
+  if(on)$('usr').textContent=USER;
+}
+function entrar(email){
+  USER=email;loadData(email);
+  try{localStorage.setItem('bakeep:session',email)}catch(e){}
+  $('apw').value='';$('apw2').value='';$('gbox').hidden=true;sesionUI();go('inicio');
+}
+function salir(){USER=null;KEY=null;S=null;try{localStorage.removeItem('bakeep:session')}catch(e){}sesionUI();setModoAcc('login');go('acceso')}
+$('salir').addEventListener('click',salir);
+$('tLogin').addEventListener('click',function(){setModoAcc('login')});
+$('tReg').addEventListener('click',function(){setModoAcc('reg')});
+['aem','apw','apw2'].forEach(function(id){$(id).addEventListener('keydown',function(e){if(e.key==='Enter')$('asub').click()})});
+$('asub').addEventListener('click',function(){
+  var em=$('aem').value.trim().toLowerCase(),pw=$('apw').value;
+  if(!okEmail(em))return msg('msgAcc','err','Escribe un correo válido (ej: nombre@correo.com).',ICON.err);
+  if(pw.length<6)return msg('msgAcc','err','La contraseña debe tener al menos 6 caracteres.',ICON.err);
+  var u=USERS[em];
+  if(modoAcc==='reg'){
+    if(u)return msg('msgAcc','warn','Ese correo ya tiene una cuenta. Prueba iniciando sesión.',ICON.warn);
+    if(pw!==$('apw2').value)return msg('msgAcc','err','Las contraseñas no coinciden.',ICON.err);
+    var salt=randSalt();
+    hashPw(pw,salt).then(function(h){USERS[em]={salt:salt,hash:h,prov:'correo'};saveUsers();entrar(em)});
+  }else{
+    if(!u||!u.hash)return msg('msgAcc','err',u?'Esta cuenta entra con Google. Usa el botón Continuar con Google.':'Correo o contraseña incorrectos.',ICON.err);
+    hashPw(pw,u.salt).then(function(h){if(h===u.hash)entrar(em);else msg('msgAcc','err','Correo o contraseña incorrectos.',ICON.err)});
+  }
+});
+$('gbtn').addEventListener('click',function(){$('gbox').hidden=false;$('gem').focus()});
+$('gcancel').addEventListener('click',function(){$('gbox').hidden=true});
+$('gok').addEventListener('click',function(){
+  var em=$('gem').value.trim().toLowerCase();
+  if(!okEmail(em))return msg('msgAcc','err','Escribe el correo de tu cuenta de Google.',ICON.err);
+  if(!USERS[em]){USERS[em]={prov:'google'};saveUsers()}
+  entrar(em);
+});
+function boot(){
+  var em=null;try{em=localStorage.getItem('bakeep:session')}catch(e){}
+  setModoAcc('login');
+  if(em&&USERS[em]){USER=em;loadData(em);sesionUI();go('inicio')}else{sesionUI();go('acceso')}
+}
+
 function tick(){var d=new Date();$("clk").textContent=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")}
-tick();setInterval(tick,30000);fillReg();
+tick();setInterval(tick,30000);boot();
 </script>
 </body>
 </html>
